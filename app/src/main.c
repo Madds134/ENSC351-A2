@@ -1,29 +1,31 @@
 // Main program for the light sampler: initializes all modules, waits for
-// the shutdown request, then cleans everything up.
-// TEMPORARY: runs for a fixed time until UDP "stop" exists (step 6).
+// the UDP "stop" command, then cleans everything up in reverse order.
 
-#include "sampler.h"
+#include "stop.h"
 #include "periodTimer.h"
+#include "sampler.h"
 #include "reporter.h"
-#include "hal/timing.h"
+#include "UDP.h"
 
 #include <stdio.h>
-
-#define TEST_RUN_TIME_MS 10000
 
 int main(void)
 {
     printf("Light sampler starting...\n");
 
+    Stop_init();
     Period_init();
     Sampler_init();
     Reporter_init();
+    UDP_init();
 
-    Timing_sleepMs(TEST_RUN_TIME_MS);
+    Stop_waitForRequest();
 
+    UDP_cleanup();
     Reporter_cleanup();
     Sampler_cleanup();
     Period_cleanup();
+    Stop_cleanup();
 
     printf("Light sampler done.\n");
     return 0;

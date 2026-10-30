@@ -107,7 +107,7 @@ void Reporter_cleanup(void)
     isInitialized = false;
 }
 
-int Report_getDipCount(void)
+int Reporter_getDipCount(void)
 {
     int count;
     pthread_mutex_lock(&lock);
