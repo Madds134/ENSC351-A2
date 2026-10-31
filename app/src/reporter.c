@@ -1,6 +1,7 @@
 #include "reporter.h"
 #include "sampler.h"
 #include "periodTimer.h"
+#include "dip_detector.h"
 #include "hal/timing.h"
 
 #include <pthread.h>
@@ -62,7 +63,7 @@ static void report_one_second(void)
     double *samples = Sampler_getHistory(&numSamples);
     double avg = Sampler_getAverageReading();
 
-    int dips = 0;
+    int dips = DipDetector_countDips(samples, numSamples, avg);
     setDipCount(dips);
 
     print_stats(numSamples, avg, dips, &stats);

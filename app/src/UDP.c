@@ -259,6 +259,13 @@ static const Command *findCommand(const char *word, size_t wordLength)
     return NULL;
 }
 
+/**
+ * @brief Runs the command in one received packet and replies to the sender
+ * 
+ * @param command Terminated packet text
+ * @param sender address of the client that sent the command
+ * @return false if server should stip, true otherwise
+ */
 static bool handleIncomingCommand(const char *command, const struct sockaddr_in *sender)
 {
     size_t wordLength = strcspn(command, WORD_SEPARATORS);
@@ -272,7 +279,12 @@ static bool handleIncomingCommand(const char *command, const struct sockaddr_in 
     return toRun->handler(sender);
 }
 
-
+/**
+ * @brief UDP server thread, receives one command per packet and replies
+ * 
+ * @param arg Unsued
+ * @return void* 
+ */
 static void *udpThreadFn(void *arg)
 {
     (void)arg;
