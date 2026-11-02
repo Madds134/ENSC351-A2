@@ -65,6 +65,7 @@ static void openSocket(void)
  * 
  * @param message text to send
  * @param sender address of the client that sent the command
+ * @note Claude was used to assist in the syntax needed to make this
  */
 static void sendReply(const char *message, const struct sockaddr_in *sender)
 {
@@ -177,6 +178,7 @@ static void sendPacket(const char *packet, size_t *packetLength, const struct so
  * @param index Index of sample in history
  * @param numSamples Total smaples in history
  * @return size_t Number of characters written
+ * @note Claude was used to assist in syntax needed to format th esamples
  */
 static size_t formatSample(char *text, size_t textSize, double volts, int index, int numSamples)
 {
@@ -189,6 +191,7 @@ static size_t formatSample(char *text, size_t textSize, double volts, int index,
  * @brief Replies with dump of every sample from previous second
  * @param sender address of the client that sent the command
  * @return true to keep UDP server running 
+ * @note Claude was used to assist with creating packet with memcpy
  */
 static bool handleHistoryCommand(const struct sockaddr_in *sender)
 {
@@ -284,6 +287,7 @@ static bool handleIncomingCommand(const char *command, const struct sockaddr_in 
  * 
  * @param arg Unsued
  * @return void* 
+ * @note Claude was used in syntax for creating UDP thread
  */
 static void *udpThreadFn(void *arg)
 {

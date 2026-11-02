@@ -5,6 +5,7 @@
 #define DIP_TRIGGER_DROP_VOLTS 0.1
 #define DIP_REARM_DROP_VOLTS 0.07
 
+// Claude was used to help understand the hystersis
 int DipDetector_countDips(const double *samples, int numSamples, double averageVolts)
 {
     double triggerLevel = averageVolts - DIP_TRIGGER_DROP_VOLTS;
