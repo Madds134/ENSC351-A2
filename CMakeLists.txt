@@ -1,5 +1,7 @@
 # CMake Build Configuration for root of project
 cmake_minimum_required(VERSION 3.18)
+set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
+
 project(light_sampler VERSION 1.0 DESCRIPTION "Light dip detector" LANGUAGES C)
 
 # Compiler options (inherited by sub-folders)
@@ -8,8 +10,9 @@ add_compile_options(-Wall -Werror -Wpedantic -Wextra)
 add_compile_options(-fdiagnostics-color)
 
 # Address sanitizer: useful while developing, but it slows sampling and
-# conflicts with valgrind. Disable with: cmake -S . -B build -DENABLE_ASAN=OFF
-option(ENABLE_ASAN "Build with the address sanitizer" ON)
+# conflicts with valgrind, so it is off by default.
+# Enable with: cmake -S . -B build -DENABLE_ASAN=ON
+option(ENABLE_ASAN "Build with the address sanitizer" OFF)
 if(ENABLE_ASAN)
     add_compile_options(-fsanitize=address)
     add_link_options(-fsanitize=address)

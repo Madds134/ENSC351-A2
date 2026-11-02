@@ -2,6 +2,7 @@
 #include "sampler.h"
 #include "periodTimer.h"
 #include "dip_detector.h"
+#include "flash_control.h"
 #include "hal/timing.h"
 
 #include <pthread.h>
@@ -13,9 +14,6 @@
 
 #define REPORT_INTERVAL_MS 1000
 #define NUM_SAMPLES_TO_REPORT 10
-
-// test value
-#define TEST_FLASH_HZ 0
 
 static int dipCount = 0;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -36,8 +34,8 @@ static void setDipCount(int count)
 
 static void print_stats(int numSamples, double avg, int dips, const Period_statistics_t *stats)
 {
-        printf("#Smpl/s = %4d  Flash @ %3dHz  avg = %5.3fV  dips = %3d  Smpl ms[%6.3f, %6.3f] avg %6.3f/%4d\n",
-           numSamples, TEST_FLASH_HZ, avg, dips,
+    printf("#Smpl/s = %4d  Flash @ %3dHz  avg = %5.3fV  dips = %3d  Smpl ms[%6.3f, %6.3f] avg %6.3f/%4d\n",
+           numSamples, FlashControl_getHz(), avg, dips,
            stats->minPeriodInMs, stats->maxPeriodInMs, stats->avgPeriodInMs, stats->numSamples);
 }
 

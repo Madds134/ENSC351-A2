@@ -8,3 +8,9 @@ file(GLOB MY_SOURCES "src/*.c")
 add_library(hal STATIC ${MY_SOURCES})
 
 target_include_directories(hal PUBLIC include)
+
+# Link ARM64 libgpiod
+target_link_directories(hal PUBLIC
+    /usr/lib/aarch64-linux-gnu
+)
+target_link_libraries(hal PUBLIC gpiod)

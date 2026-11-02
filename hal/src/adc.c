@@ -13,6 +13,21 @@
 #define SPI_SPEED_HZ 250000
 #define SPI_BITS_PER_WORD 8
 
+// MCP3208 command format (3-byte transfer):
+//   byte 0: 0 0 0 0 0 START SGL D2
+//   byte 1: D1 D0 x x x x x x
+//   reply:  result bits B11..B8 in the low nibble of byte 1, B7..B0 in byte 2
+#define ADC_TRANSFER_LENGTH 3
+#define ADC_MAX_CHANNEL 7
+#define ADC_START_BIT 0x04
+#define ADC_SINGLE_ENDED_BIT 0x02
+#define ADC_CHANNEL_HIGH_BIT 0x04   // D2, sent in byte 0
+#define ADC_CHANNEL_HIGH_SHIFT 2
+#define ADC_CHANNEL_LOW_BITS 0x03   // D1 D0, sent at the top of byte 1
+#define ADC_CHANNEL_LOW_SHIFT 6
+#define ADC_RESULT_HIGH_MASK 0x0F
+#define BITS_PER_BYTE 8
+
 static int spi_fd = -1; // File Descriptor for SPI (Linux only has positive values for valid file descriptors)
 static bool isInitialized = false;
 
@@ -68,19 +83,23 @@ int ADC_read_channel(uint8_t channel) {
         exit(EXIT_FAILURE);
     }
 
-    if (channel > 7) {
+    if (channel > ADC_MAX_CHANNEL) {
         fprintf(stderr, "ADC Driver: Invalid Channel %u\n", channel);
         exit(EXIT_FAILURE);
     }
 
-    uint8_t tx[3] =  { (uint8_t)(0x06 | ((channel & 0x04) >> 2)), (uint8_t)((channel & 0x03) << 6), 0x00 };
-
-    uint8_t rx[3] = { 0 };
+    uint8_t tx[ADC_TRANSFER_LENGTH] = {
+        (uint8_t)(ADC_START_BIT | ADC_SINGLE_ENDED_BIT |
+                  ((channel & ADC_CHANNEL_HIGH_BIT) >> ADC_CHANNEL_HIGH_SHIFT)),
+        (uint8_t)((channel & ADC_CHANNEL_LOW_BITS) << ADC_CHANNEL_LOW_SHIFT),
+        0x00
+    };
+    uint8_t rx[ADC_TRANSFER_LENGTH] = { 0 };
 
     struct spi_ioc_transfer tr = {
         .tx_buf = (unsigned long)tx,
         .rx_buf = (unsigned long)rx,
-        .len = 3,
+        .len = ADC_TRANSFER_LENGTH,
         .speed_hz = SPI_SPEED_HZ,
         .bits_per_word = SPI_BITS_PER_WORD,
         .cs_change = 0
@@ -91,5 +110,5 @@ int ADC_read_channel(uint8_t channel) {
         return ADC_READ_ERROR;
     }
 
-    return ((rx[1] & 0x0F) << 8) | rx[2]; // 12-bit result
+    return ((rx[1] & ADC_RESULT_HIGH_MASK) << BITS_PER_BYTE) | rx[2]; // 12-bit result
 }
